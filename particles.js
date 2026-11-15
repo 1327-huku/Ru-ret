@@ -1,6 +1,6 @@
-// 物理パーティクル＆VFXエンジン
+// 物理パーティクル＆VFXエンジン（サイバーパンク・ネオン同期版）
 const fxCanvas = document.getElementById('fx-canvas');
-const ctx = fxCanvas.getContext('2d');
+const fxCtx = fxCanvas.getContext('2d');
 
 let particles = [];
 let spotlights = [];
@@ -17,19 +17,19 @@ class Confetti {
   constructor(x, y, color) {
     this.x = x;
     this.y = y;
-    this.vx = (Math.random() - 0.5) * 20;
-    this.vy = (Math.random() - 1) * 20 - 5;
+    this.vx = (Math.random() - 0.5) * 24;
+    this.vy = (Math.random() - 1) * 22 - 6;
     this.color = color;
-    this.size = Math.random() * 8 + 4;
+    this.size = Math.random() * 9 + 4;
     this.rotation = Math.random() * 360;
-    this.rotSpeed = (Math.random() - 0.5) * 20;
+    this.rotSpeed = (Math.random() - 0.5) * 24;
     this.life = 1.0;
-    this.decay = Math.random() * 0.01 + 0.005;
+    this.decay = Math.random() * 0.012 + 0.005;
   }
   update() {
     this.x += this.vx;
     this.y += this.vy;
-    this.vy += 0.5; // 重力
+    this.vy += 0.52; // 重力
     this.vx *= 0.98; // 空気抵抗
     this.rotation += this.rotSpeed;
     this.life -= this.decay;
@@ -39,8 +39,10 @@ class Confetti {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation * Math.PI / 180);
     ctx.fillStyle = this.color;
-    ctx.globalAlpha = this.life;
-    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = this.color;
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
     ctx.restore();
   }
 }
@@ -50,12 +52,12 @@ class Spotlight {
     this.x = x;
     this.color = color;
     this.angle = 0;
-    this.targetAngle = (Math.random() - 0.5) * 40;
+    this.targetAngle = (Math.random() - 0.5) * 45;
   }
   update() {
     this.angle += (this.targetAngle - this.angle) * 0.05;
     if (Math.abs(this.targetAngle - this.angle) < 1) {
-      this.targetAngle = (Math.random() - 0.5) * 40;
+      this.targetAngle = (Math.random() - 0.5) * 45;
     }
   }
   draw(ctx) {
@@ -64,15 +66,15 @@ class Spotlight {
     ctx.rotate(this.angle * Math.PI / 180);
     
     const grad = ctx.createLinearGradient(0, 0, 0, height);
-    grad.addColorStop(0, this.color + '88'); // 50% opacity
+    grad.addColorStop(0, this.color + '99'); // 60% opacity
     grad.addColorStop(1, this.color + '00'); // 0% opacity
     
     ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.moveTo(-20, 0);
-    ctx.lineTo(20, 0);
-    ctx.lineTo(300, height);
-    ctx.lineTo(-300, height);
+    ctx.moveTo(-25, 0);
+    ctx.lineTo(25, 0);
+    ctx.lineTo(340, height);
+    ctx.lineTo(-340, height);
     ctx.fill();
     ctx.restore();
   }
@@ -80,47 +82,60 @@ class Spotlight {
 
 const VFX = {
   startSpotlights() {
+    // CSSのメインカラー（シアン＆ピンク）に統一
     spotlights = [
-      new Spotlight(width * 0.2, '#00f0ff'),
-      new Spotlight(width * 0.8, '#ff003c')
+      new Spotlight(width * 0.2, '#00f3ff'),
+      new Spotlight(width * 0.8, '#ff00ea')
     ];
   },
   stopSpotlights() {
     spotlights = [];
   },
   triggerExplosion(isRed) {
-    const color = isRed ? '#ff003c' : '#00f0ff';
-    const altColor = '#ffffff';
-    for (let i = 0; i < 150; i++) {
+    // 勝者カラー + CSSアクセント（ピンク・イエロー・ホワイト）で華やかに爆発
+    const mainColor = isRed ? '#ff003c' : '#00f3ff';
+    const subColor = isRed ? '#ff00ea' : '#bd00ff';
+    const sparkColor = '#fcee0a';
+
+    for (let i = 0; i < 180; i++) {
+      const rand = Math.random();
+      let pColor = mainColor;
+      if (rand > 0.7) pColor = subColor;
+      else if (rand > 0.5) pColor = sparkColor;
+      else if (rand > 0.35) pColor = '#ffffff';
+
       particles.push(new Confetti(
         width / 2, 
         height / 2, 
-        Math.random() > 0.5 ? color : altColor
+        pColor
       ));
     }
     
     // 画面シェイク
-    document.getElementById('app-container').classList.add('shake-active');
-    setTimeout(() => {
-      document.getElementById('app-container').classList.remove('shake-active');
-    }, 400);
+    const container = document.getElementById('app-container');
+    if (container) {
+      container.classList.add('shake-active');
+      setTimeout(() => {
+        container.classList.remove('shake-active');
+      }, 450);
+    }
   },
   animate() {
-    ctx.clearRect(0, 0, width, height);
+    fxCtx.clearRect(0, 0, width, height);
     
-    // 暗い背景
-    ctx.fillStyle = 'rgba(5, 5, 16, 0.3)';
-    ctx.fillRect(0, 0, width, height);
+    // サイバーブラックの残像オーバーレイ
+    fxCtx.fillStyle = 'rgba(5, 5, 5, 0.25)';
+    fxCtx.fillRect(0, 0, width, height);
 
     spotlights.forEach(s => {
       s.update();
-      s.draw(ctx);
+      s.draw(fxCtx);
     });
 
     for (let i = particles.length - 1; i >= 0; i--) {
       let p = particles[i];
       p.update();
-      p.draw(ctx);
+      p.draw(fxCtx);
       if (p.life <= 0 || p.y > height) {
         particles.splice(i, 1);
       }
