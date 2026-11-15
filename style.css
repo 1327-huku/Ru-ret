@@ -1,20 +1,14 @@
+@charset "UTF-8";
 /* ==========================================================================
-   CYBERPUNK "ULTRA DELUXE" THEME CSS FRAMEWORK
-   Version: 3.0.0
-   Design: Neon, Glitch, CRT, Glassmorphism, HUD
+   CYBERPUNK "ULTRA DELUXE" THEME CSS FRAMEWORK (PART 1 / 2)
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. CSS VARIABLES (Custom Properties)
-   -------------------------------------------------------------------------- */
 :root {
-  /* Core Colors */
   --cyber-black: #050505;
   --cyber-dark-gray: #0f0f12;
   --cyber-light-gray: #2a2a35;
   --cyber-white: #f0f0f0;
   
-  /* Neon Accents */
   --neon-cyan: #00f3ff;
   --neon-cyan-dim: rgba(0, 243, 255, 0.3);
   --neon-pink: #ff00ea;
@@ -28,44 +22,19 @@
   --neon-green: #00ff66;
   --neon-green-dim: rgba(0, 255, 102, 0.3);
 
-  /* Glassmorphism */
   --glass-bg-light: rgba(255, 255, 255, 0.05);
-  --glass-bg-dark: rgba(20, 20, 25, 0.65);
-  --glass-border: rgba(0, 243, 255, 0.2);
-  --glass-blur: blur(12px);
+  --glass-bg-dark: rgba(20, 20, 25, 0.72);
+  --glass-border: rgba(0, 243, 255, 0.25);
+  --glass-blur: blur(14px);
 
-  /* HUD & Borders */
-  --hud-border-width: 2px;
-  --hud-border-style: solid;
-  --hud-corner-size: 15px;
-
-  /* Typography */
+  --hud-corner-size: 16px;
   --font-main: 'Courier New', Courier, 'Orbitron', monospace;
-  --font-hud: 'Share Tech Mono', monospace;
-  --text-glow-cyan: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-  --text-glow-pink: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-  
-  /* Spacing System */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 1rem;
-  --space-4: 1.5rem;
-  --space-5: 2rem;
-  --space-6: 3rem;
-  --space-8: 4rem;
-  --space-10: 5rem;
-  
-  /* Z-Index Layers */
-  --z-bg: -1;
-  --z-base: 1;
-  --z-crt: 9998;
-  --z-glitch: 9999;
-  --z-modal: 10000;
+  --text-glow-cyan: 0 0 5px var(--neon-cyan), 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
+  --text-glow-pink: 0 0 5px var(--neon-pink), 0 0 12px var(--neon-pink), 0 0 24px var(--neon-pink);
+  --text-glow-red: 0 0 5px var(--neon-red), 0 0 12px var(--neon-red), 0 0 24px var(--neon-red);
+  --text-glow-yellow: 0 0 5px var(--neon-yellow), 0 0 15px var(--neon-yellow);
 }
 
-/* --------------------------------------------------------------------------
-   2. RESET & BASE
-   -------------------------------------------------------------------------- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -75,15 +44,16 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  height: 100%;
 }
 
-body.bg-base {
+body {
   background-color: var(--cyber-black);
   background-image: 
-    linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(rgba(255, 0, 234, 0.02) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(255, 0, 234, 0.02) 2px, transparent 2px);
+    linear-gradient(rgba(0, 243, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(255, 0, 234, 0.03) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 0, 234, 0.03) 2px, transparent 2px);
   background-size: 40px 40px, 40px 40px, 200px 200px, 200px 200px;
   background-position: center center;
   color: var(--cyber-white);
@@ -94,10 +64,41 @@ body.bg-base {
   position: relative;
 }
 
-/* Custom Scrollbar */
+/* CRT 走査線オーバーレイ */
+body::before {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9998;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+/* CRT ブラウン管ビネット＆フリッカー */
+body::after {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(0,0,0,0) 55%, rgba(0,0,0,0.65) 100%);
+  z-index: 9999;
+  pointer-events: none;
+  animation: crt-flicker 0.15s infinite;
+}
+
+/* カスタムスクロールバー */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: var(--cyber-dark-gray);
@@ -111,423 +112,697 @@ body.bg-base {
   background: var(--neon-cyan);
 }
 
-/* --------------------------------------------------------------------------
-   3. TYPOGRAPHY
-   -------------------------------------------------------------------------- */
-.text-main {
-  color: var(--cyber-white);
-  text-shadow: var(--text-glow-cyan);
-  letter-spacing: 0.1em;
-}
-
-h1, .h1 { font-size: 3rem; text-transform: uppercase; font-weight: 800; margin-bottom: var(--space-4); }
-h2, .h2 { font-size: 2.5rem; text-transform: uppercase; font-weight: 700; margin-bottom: var(--space-3); }
-h3, .h3 { font-size: 2rem; text-transform: uppercase; font-weight: 600; margin-bottom: var(--space-3); }
-h4, .h4 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: var(--space-2); }
-h5, .h5 { font-size: 1.25rem; margin-bottom: var(--space-2); }
-h6, .h6 { font-size: 1rem; margin-bottom: var(--space-2); }
-
-p { margin-bottom: var(--space-3); }
-a { color: var(--neon-cyan); text-decoration: none; transition: 0.3s; }
-a:hover { color: var(--neon-pink); text-shadow: var(--text-glow-pink); }
-
-.text-neon-cyan { color: var(--neon-cyan); text-shadow: var(--text-glow-cyan); }
-.text-neon-pink { color: var(--neon-pink); text-shadow: var(--text-glow-pink); }
-.text-neon-yellow { color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow); }
-.text-neon-red { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
-
-/* Glitch Text Effect */
-.text-glitch {
-  position: relative;
-  display: inline-block;
-  color: var(--cyber-white);
-}
-.text-glitch::before,
-.text-glitch::after {
-  content: attr(data-text);
-  position: absolute;
+/* VFX背景キャンバス[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span) */
+#fx-canvas {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--cyber-black);
-}
-.text-glitch::before {
-  left: 2px;
-  text-shadow: -2px 0 var(--neon-red);
-  clip: rect(24px, 550px, 90px, 0);
-  animation: glitch-anim-2 3s infinite linear alternate-reverse;
-}
-.text-glitch::after {
-  left: -2px;
-  text-shadow: -2px 0 var(--neon-cyan);
-  clip: rect(85px, 550px, 140px, 0);
-  animation: glitch-anim 2.5s infinite linear alternate-reverse;
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* --------------------------------------------------------------------------
-   4. CRT OVERLAY & EFFECTS
-   -------------------------------------------------------------------------- */
-.crt-container {
+/* メインコンテナ[span_6](start_span)[span_6](end_span) */
+#app-container {
   position: relative;
-  width: 100%;
-  min-height: 100vh;
-  z-index: var(--z-base);
-}
-
-.crt-container::before {
-  content: "";
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  z-index: var(--z-crt);
-  background-size: 100% 3px, 6px 100%;
-  pointer-events: none;
-}
-
-.crt-container::after {
-  content: "";
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%);
-  z-index: var(--z-crt);
-  pointer-events: none;
-  animation: crt-flicker 0.15s infinite;
-}
-
-.scanline {
-  width: 100%;
-  height: 10px;
-  z-index: 9997;
-  position: absolute;
-  pointer-events: none;
-  background: linear-gradient(0deg, transparent 0%, rgba(0, 243, 255, 0.2) 50%, transparent 100%);
-  animation: scanline 8s linear infinite;
-  opacity: 0.5;
-}
-
-/* --------------------------------------------------------------------------
-   5. BUTTONS (CYBERPUNK & HUD)
-   -------------------------------------------------------------------------- */
-.btn-cyber {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  padding: 16px 32px;
+  min-height: 100vh;
+}
+
+/* ガラスモーフィズム＆HUDパネル[span_7](start_span)[span_7](end_span) */
+.glass-panel {
   background: var(--glass-bg-dark);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--neon-cyan-dim);
-  border-radius: 2px;
-  color: var(--neon-cyan);
-  font-family: var(--font-main);
-  font-size: 1.1rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-}
-
-.btn-cyber::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.4), transparent);
-  transition: all 0.4s ease;
-  z-index: 1;
-}
-
-.btn-cyber:hover {
-  background: rgba(0, 243, 255, 0.1);
-  border-color: var(--neon-cyan);
-  color: var(--cyber-white);
-  box-shadow: 
-    0 0 15px var(--neon-cyan-dim),
-    inset 0 0 20px var(--neon-cyan-dim);
-  text-shadow: 0 0 5px var(--neon-cyan);
-}
-
-.btn-cyber:hover::before {
-  left: 100%;
-  animation: btn-glitch 0.2s linear infinite;
-}
-
-/* Button Variants */
-.btn-cyber-pink {
-  border-color: var(--neon-pink-dim);
-  color: var(--neon-pink);
-}
-.btn-cyber-pink:hover {
-  background: rgba(255, 0, 234, 0.1);
-  border-color: var(--neon-pink);
-  box-shadow: 0 0 15px var(--neon-pink-dim), inset 0 0 20px var(--neon-pink-dim);
-  text-shadow: 0 0 5px var(--neon-pink);
-}
-.btn-cyber-pink::before { background: linear-gradient(90deg, transparent, rgba(255, 0, 234, 0.4), transparent); }
-
-.btn-cyber-red {
-  border-color: var(--neon-red-dim);
-  color: var(--neon-red);
-}
-.btn-cyber-red:hover {
-  background: rgba(255, 0, 60, 0.1);
-  border-color: var(--neon-red);
-  box-shadow: 0 0 15px var(--neon-red-dim), inset 0 0 20px var(--neon-red-dim);
-  text-shadow: 0 0 5px var(--neon-red);
-}
-
-/* --------------------------------------------------------------------------
-   6. HUD ELEMENTS & CONTAINERS (Glassmorphism)
-   -------------------------------------------------------------------------- */
-.hud-box {
+  border-radius: 4px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: inset 0 0 25px rgba(0, 243, 255, 0.08), 0 12px 35px rgba(0, 0, 0, 0.7);
   position: relative;
-  background: var(--glass-bg-dark);
-  backdrop-filter: var(--glass-blur);
-  border: var(--hud-border-width) var(--hud-border-style) var(--neon-cyan-dim);
-  padding: var(--space-4);
-  margin-bottom: var(--space-4);
-  box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05), 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Corner Accents */
-.hud-box::before, .hud-box::after {
+.glass-panel:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: inset 0 0 35px rgba(0, 243, 255, 0.15), 0 0 25px rgba(0, 243, 255, 0.25);
+}
+
+/* HUD 四隅のサイバー装飾 */
+.glass-panel::before,
+.glass-panel::after {
   content: '';
   position: absolute;
   width: var(--hud-corner-size);
   height: var(--hud-corner-size);
   border: 2px solid var(--neon-cyan);
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  pointer-events: none;
 }
 
-.hud-box::before {
+.glass-panel::before {
   top: -2px;
   left: -2px;
   border-right: none;
   border-bottom: none;
 }
 
-.hud-box::after {
+.glass-panel::after {
   bottom: -2px;
   right: -2px;
   border-left: none;
   border-top: none;
 }
 
-.hud-box:hover {
-  border-color: var(--neon-cyan);
-  box-shadow: inset 0 0 30px rgba(0, 243, 255, 0.1), 0 0 20px rgba(0, 243, 255, 0.2);
-}
-.hud-box:hover::before, .hud-box:hover::after {
-  width: calc(var(--hud-corner-size) * 1.5);
-  height: calc(var(--hud-corner-size) * 1.5);
-  box-shadow: 0 0 10px var(--neon-cyan);
+.glass-panel:hover::before,
+.glass-panel:hover::after {
+  width: calc(var(--hud-corner-size) * 1.6);
+  height: calc(var(--hud-corner-size) * 1.6);
+  box-shadow: 0 0 12px var(--neon-cyan);
 }
 
-/* --------------------------------------------------------------------------
-   7. FORM ELEMENTS
-   -------------------------------------------------------------------------- */
-.cyber-input {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--neon-cyan-dim);
+/* ヘッダー装飾[span_8](start_span)[span_8](end_span) */
+header.glass-panel {
+  text-align: center;
+  padding: 1.5rem 2rem;
+  border-color: var(--neon-pink-dim);
+}
+header.glass-panel::before,
+header.glass-panel::after {
+  border-color: var(--neon-pink);
+}
+
+header h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--cyber-white);
+  text-shadow: var(--text-glow-cyan);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: text-pulse 3s infinite alternate;
+}
+
+.subtitle {
+  color: var(--neon-pink);
+  text-shadow: var(--text-glow-pink);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+/* 入力フェーズ[span_9](start_span)[span_9](end_span) */
+#input-phase h2 {
+  text-align: center;
   color: var(--neon-cyan);
-  padding: 12px 15px;
+  text-shadow: var(--text-glow-cyan);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.opt-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
+.a-label {
+  color: var(--neon-red);
+  text-shadow: 0 0 8px var(--neon-red-dim);
+}
+
+.b-label {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan-dim);
+}
+
+input[type="text"] {
+  width: 100%;
+  background: rgba(5, 5, 10, 0.75);
+  border: 1px solid var(--neon-cyan-dim);
+  color: var(--cyber-white);
+  padding: 14px 16px;
   font-family: var(--font-main);
-  font-size: 1rem;
-  letter-spacing: 2px;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
   outline: none;
-  transition: 0.3s;
+  transition: all 0.3s ease;
   border-left: 4px solid var(--neon-cyan);
 }
 
-.cyber-input:focus {
-  background: rgba(0, 243, 255, 0.05);
+input[type="text"]#opt-a {
+  border-left-color: var(--neon-red);
+}
+input[type="text"]#opt-a:focus {
+  border-color: var(--neon-red);
+  box-shadow: 0 0 18px var(--neon-red-dim), inset 0 0 10px rgba(255, 0, 60, 0.1);
+}
+
+input[type="text"]#opt-b:focus {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+  box-shadow: 0 0 18px var(--neon-cyan-dim), inset 0 0 10px rgba(0, 243, 255, 0.1);
 }
 
-.cyber-input::placeholder {
-  color: rgba(0, 243, 255, 0.3);
+input[type="text"]::placeholder {
+  color: rgba(240, 240, 240, 0.3);
 }
 
-.cyber-label {
-  display: block;
-  font-size: 0.85rem;
+/* プリセットボタン[span_10](start_span)[span_10](end_span)[span_11](start_span)[span_11](end_span) */
+.preset-chips {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.preset-btn {
+  background: rgba(189, 0, 255, 0.08);
+  border: 1px solid var(--neon-purple-dim);
   color: var(--cyber-white);
-  margin-bottom: 5px;
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.preset-btn:hover {
+  background: rgba(189, 0, 255, 0.25);
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 15px var(--neon-purple-dim);
+  transform: translateY(-2px);
+}
+/* ==========================================================================
+   CYBERPUNK "ULTRA DELUXE" THEME CSS FRAMEWORK (PART 2 / 2)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   4. ACTION BUTTONS & CYBER GLITCH EFFECTS
+   -------------------------------------------------------------------------- */
+.action-btn,
+.hub-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 18px 24px;
+  background: var(--glass-bg-dark);
+  border: 1px solid var(--neon-cyan-dim);
+  color: var(--neon-cyan);
+  font-family: var(--font-main);
+  font-size: 1.25rem;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.22em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.action-btn::before,
+.hub-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.45), transparent);
+  transition: all 0.4s ease;
+  z-index: 1;
+}
+
+.action-btn:hover:not([disabled]),
+.hub-btn:hover {
+  background: rgba(0, 243, 255, 0.16);
+  border-color: var(--neon-cyan);
+  color: var(--cyber-white);
+  box-shadow: 0 0 20px var(--neon-cyan-dim), inset 0 0 25px var(--neon-cyan-dim);
+  text-shadow: 0 0 8px var(--neon-cyan);
+  transform: translateY(-2px);
+}
+
+.action-btn:hover:not([disabled])::before,
+.hub-btn:hover::before {
+  left: 100%;
+  animation: btn-glitch 0.2s linear infinite;
+}
+
+.action-btn:active:not([disabled]),
+.hub-btn:active {
+  transform: scale(0.97);
+}
+
+.action-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: #444;
+  color: #666;
+  box-shadow: none;
+}
+
+/* スタートボタン（強烈なネオン発光）[span_3](start_span)[span_3](end_span) */
+.glow-btn:not([disabled]) {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px var(--neon-cyan-dim), inset 0 0 15px rgba(0, 243, 255, 0.15);
+  animation: border-pulse-cyan 2s infinite alternate;
+}
+
+/* セカンダリボタン（RESTART用・レッドネオン）[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span) */
+.secondary-btn {
+  border-color: var(--neon-red-dim);
+  color: var(--neon-red);
+}
+
+.secondary-btn::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 60, 0.45), transparent);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 0, 60, 0.16);
+  border-color: var(--neon-red);
+  color: var(--cyber-white);
+  box-shadow: 0 0 20px var(--neon-red-dim), inset 0 0 25px var(--neon-red-dim);
+  text-shadow: 0 0 8px var(--neon-red);
+}
+
+/* セーブボタン（ピンクネオン）[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span) */
+#btn-save {
+  border-color: var(--neon-pink-dim);
+  color: var(--neon-pink);
+}
+
+#btn-save::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 234, 0.45), transparent);
+}
+
+#btn-save:hover {
+  background: rgba(255, 0, 234, 0.16);
+  border-color: var(--neon-pink);
+  color: var(--cyber-white);
+  box-shadow: 0 0 20px var(--neon-pink-dim), inset 0 0 25px var(--neon-pink-dim);
+  text-shadow: 0 0 8px var(--neon-pink);
 }
 
 /* --------------------------------------------------------------------------
-   8. UTILITIES & LAYOUT
+   5. ROULETTE PHASE & HUD WHEEL[span_8](start_span)[span_8](end_span)
    -------------------------------------------------------------------------- */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.gap-1 { gap: var(--space-1); }
-.gap-2 { gap: var(--space-2); }
-.gap-3 { gap: var(--space-3); }
-.gap-4 { gap: var(--space-4); }
+.roulette-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  margin: 1rem auto 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.grid { display: grid; }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+/* ルーレット外周のHUDリング装飾 */
+.roulette-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 2px dashed var(--neon-cyan-dim);
+  animation: hud-spin-slow 24s linear infinite;
+  pointer-events: none;
+}
 
-.mt-1 { margin-top: var(--space-1); }
-.mt-2 { margin-top: var(--space-2); }
-.mt-3 { margin-top: var(--space-3); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-5 { margin-top: var(--space-5); }
+.roulette-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--neon-pink-dim);
+  box-shadow: 0 0 25px rgba(0, 243, 255, 0.2), inset 0 0 25px rgba(255, 0, 234, 0.15);
+  pointer-events: none;
+}
 
-.mb-1 { margin-bottom: var(--space-1); }
-.mb-2 { margin-bottom: var(--space-2); }
-.mb-3 { margin-bottom: var(--space-3); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-5 { margin-bottom: var(--space-5); }
+#roulette-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 18px rgba(0, 243, 255, 0.45));
+  transition: filter 0.3s ease;
+}
 
-.p-1 { padding: var(--space-1); }
-.p-2 { padding: var(--space-2); }
-.p-3 { padding: var(--space-3); }
-.p-4 { padding: var(--space-4); }
-.p-5 { padding: var(--space-5); }
+/* 上部ポインター（ネオンイエローの針）[span_9](start_span)[span_9](end_span)[span_10](start_span)[span_10](end_span) */
+.roulette-pointer {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 36px solid var(--neon-yellow);
+  filter: drop-shadow(0 0 12px var(--neon-yellow)) drop-shadow(0 0 25px var(--neon-red));
+  z-index: 15;
+  animation: pointer-bounce 1s infinite alternate;
+}
 
-.w-full { width: 100%; }
-.h-full { height: 100%; }
-.h-screen { height: 100vh; }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
+/* 中央のスピンボタンハブ[span_11](start_span)[span_11](end_span)[span_12](start_span)[span_12](end_span) */
+.center-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #12121a 0%, #050508 100%);
+  border: 4px solid var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 0 25px var(--neon-cyan), inset 0 0 20px rgba(0, 243, 255, 0.6);
+  transition: all 0.3s ease;
+}
 
-.relative { position: relative; }
-.absolute { position: absolute; }
-.fixed { position: fixed; }
+.center-hub:hover {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 35px var(--neon-pink), inset 0 0 25px rgba(255, 0, 234, 0.7);
+}
+
+.hub-btn {
+  border-radius: 50%;
+  width: 106px;
+  height: 106px;
+  clip-path: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  color: var(--cyber-white);
+  text-shadow: var(--text-glow-cyan);
+}
+
+.hub-btn:hover {
+  background: rgba(255, 0, 234, 0.15);
+  box-shadow: none;
+  transform: none;
+}
+
+/* 回転中のボタンアニメーション[span_13](start_span)[span_13](end_span) */
+.hub-btn.spinning {
+  animation: pulse-red 0.6s infinite alternate;
+  color: var(--neon-red);
+  font-size: 1.2rem;
+}
+
+/* ステータス表示テキスト[span_14](start_span)[span_14](end_span)[span_15](start_span)[span_15](end_span) */
+.status-display,
+#status-text {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+  text-shadow: var(--text-glow-cyan);
+  min-height: 2.2rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.45);
+  border-top: 1px solid var(--neon-cyan-dim);
+  border-bottom: 1px solid var(--neon-cyan-dim);
+}
 
 /* --------------------------------------------------------------------------
-   9. KEYFRAME ANIMATIONS
+   6. RESULT PHASE (THE VERDICT)[span_16](start_span)[span_16](end_span)[span_17](start_span)[span_17](end_span)
    -------------------------------------------------------------------------- */
+.result-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: var(--neon-pink);
+  text-shadow: var(--text-glow-pink);
+  letter-spacing: 0.2em;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.winner-text {
+  text-align: center;
+  font-size: 3.4rem;
+  font-weight: 900;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid currentColor;
+  letter-spacing: 0.08em;
+  word-break: break-word;
+  position: relative;
+}
+
+/* OPTION A (Red) 勝利時[span_18](start_span)[span_18](end_span)[span_19](start_span)[span_19](end_span)[span_20](start_span)[span_20](end_span) */
+.red-win {
+  color: var(--neon-red);
+  text-shadow: 0 0 10px var(--neon-red), 0 0 25px var(--neon-red), 0 0 50px var(--neon-red);
+  box-shadow: 0 0 30px var(--neon-red-dim), inset 0 0 25px var(--neon-red-dim);
+  animation: winner-impact 0.6s cubic-bezier(0.22, 1, 0.36, 1), glitch-skew 2.5s infinite linear alternate-reverse;
+}
+
+/* OPTION B (Cyan/Blue) 勝利時[span_21](start_span)[span_21](end_span)[span_22](start_span)[span_22](end_span)[span_23](start_span)[span_23](end_span) */
+.blue-win {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-cyan), 0 0 50px var(--neon-cyan);
+  box-shadow: 0 0 30px var(--neon-cyan-dim), inset 0 0 25px var(--neon-cyan-dim);
+  animation: winner-impact 0.6s cubic-bezier(0.22, 1, 0.36, 1), glitch-skew 2.5s infinite linear alternate-reverse;
+}
+
+.loser-text {
+  text-align: center;
+  color: #999;
+  margin-bottom: 2.2rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.1em;
+  text-decoration: line-through;
+  text-decoration-color: var(--neon-red);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.action-buttons > button {
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   7. PHASE VISIBILITY & SCREEN SHAKE[span_24](start_span)[span_24](end_span)[span_25](start_span)[span_25](end_span)[span_26](start_span)[span_26](end_span)
+   -------------------------------------------------------------------------- */
+.hidden {
+  display: none !important;
+}
+
+.active-phase {
+  display: block;
+  animation: phaseEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.shake-active {
+  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* --------------------------------------------------------------------------
+   8. KEYFRAME ANIMATIONS
+   -------------------------------------------------------------------------- */
+@keyframes phaseEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes text-pulse {
+  0% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 12px var(--neon-cyan); }
+  100% { text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-cyan), 0 0 45px var(--neon-purple); }
+}
+
+@keyframes border-pulse-cyan {
+  0% { box-shadow: 0 0 10px var(--neon-cyan-dim), inset 0 0 10px rgba(0, 243, 255, 0.1); }
+  100% { box-shadow: 0 0 25px var(--neon-cyan), inset 0 0 20px rgba(0, 243, 255, 0.3); }
+}
+
+@keyframes pulse-red {
+  0% {
+    text-shadow: 0 0 5px var(--neon-red);
+    transform: scale(0.96);
+  }
+  100% {
+    text-shadow: 0 0 20px var(--neon-red), 0 0 40px var(--neon-red);
+    transform: scale(1.04);
+  }
+}
+
+@keyframes hud-spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pointer-bounce {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(5px); }
+}
+
 @keyframes crt-flicker {
-  0% { opacity: 0.95; }
-  5% { opacity: 0.85; }
-  10% { opacity: 0.95; }
-  15% { opacity: 1; }
-  20% { opacity: 0.9; }
-  25% { opacity: 0.95; }
-  30% { opacity: 1; }
-  40% { opacity: 0.85; }
-  50% { opacity: 0.95; }
-  60% { opacity: 1; }
-  70% { opacity: 0.9; }
-  80% { opacity: 0.95; }
-  90% { opacity: 0.85; }
+  0% { opacity: 0.96; }
+  25% { opacity: 0.91; }
+  50% { opacity: 0.98; }
+  75% { opacity: 0.89; }
   100% { opacity: 0.95; }
 }
 
-@keyframes glitch-anim {
-  0% { clip: rect(44px, 9999px, 86px, 0); transform: translate(0); }
-  5% { clip: rect(65px, 9999px, 12px, 0); transform: translate(-2px, 2px); }
-  10% { clip: rect(33px, 9999px, 98px, 0); transform: translate(2px, -2px); }
-  15% { clip: rect(10px, 9999px, 45px, 0); transform: translate(-2px, 2px); }
-  20% { clip: rect(78px, 9999px, 23px, 0); transform: translate(2px, -2px); }
-  25% { clip: rect(55px, 9999px, 67px, 0); transform: translate(-2px, 2px); }
-  30% { clip: rect(22px, 9999px, 88px, 0); transform: translate(2px, -2px); }
-  35% { clip: rect(89px, 9999px, 34px, 0); transform: translate(-2px, 2px); }
-  40% { clip: rect(45px, 9999px, 76px, 0); transform: translate(2px, -2px); }
-  45% { clip: rect(12px, 9999px, 55px, 0); transform: translate(-2px, 2px); }
-  50% { clip: rect(67px, 9999px, 22px, 0); transform: translate(2px, -2px); }
-  55% { clip: rect(98px, 9999px, 10px, 0); transform: translate(-2px, 2px); }
-  60% { clip: rect(23px, 9999px, 89px, 0); transform: translate(2px, -2px); }
-  65% { clip: rect(76px, 9999px, 44px, 0); transform: translate(-2px, 2px); }
-  70% { clip: rect(34px, 9999px, 65px, 0); transform: translate(2px, -2px); }
-  75% { clip: rect(88px, 9999px, 33px, 0); transform: translate(-2px, 2px); }
-  80% { clip: rect(11px, 9999px, 78px, 0); transform: translate(2px, -2px); }
-  85% { clip: rect(56px, 9999px, 55px, 0); transform: translate(-2px, 2px); }
-  90% { clip: rect(99px, 9999px, 22px, 0); transform: translate(2px, -2px); }
-  95% { clip: rect(21px, 9999px, 98px, 0); transform: translate(-2px, 2px); }
-  100% { clip: rect(77px, 9999px, 45px, 0); transform: translate(2px, -2px); }
-}
-
-@keyframes glitch-anim-2 {
-  0% { clip: rect(22px, 9999px, 76px, 0); transform: translate(0); }
-  5% { clip: rect(88px, 9999px, 33px, 0); transform: translate(2px, -2px); }
-  10% { clip: rect(11px, 9999px, 98px, 0); transform: translate(-2px, 2px); }
-  15% { clip: rect(55px, 9999px, 45px, 0); transform: translate(2px, -2px); }
-  20% { clip: rect(99px, 9999px, 12px, 0); transform: translate(-2px, 2px); }
-  25% { clip: rect(34px, 9999px, 67px, 0); transform: translate(2px, -2px); }
-  30% { clip: rect(77px, 9999px, 23px, 0); transform: translate(-2px, 2px); }
-  35% { clip: rect(12px, 9999px, 89px, 0); transform: translate(2px, -2px); }
-  40% { clip: rect(66px, 9999px, 34px, 0); transform: translate(-2px, 2px); }
-  45% { clip: rect(98px, 9999px, 76px, 0); transform: translate(2px, -2px); }
-  50% { clip: rect(23px, 9999px, 11px, 0); transform: translate(-2px, 2px); }
-  55% { clip: rect(89px, 9999px, 55px, 0); transform: translate(2px, -2px); }
-  60% { clip: rect(45px, 9999px, 99px, 0); transform: translate(-2px, 2px); }
-  65% { clip: rect(11px, 9999px, 22px, 0); transform: translate(2px, -2px); }
-  70% { clip: rect(78px, 9999px, 88px, 0); transform: translate(-2px, 2px); }
-  75% { clip: rect(33px, 9999px, 44px, 0); transform: translate(2px, -2px); }
-  80% { clip: rect(99px, 9999px, 66px, 0); transform: translate(-2px, 2px); }
-  85% { clip: rect(22px, 9999px, 12px, 0); transform: translate(2px, -2px); }
-  90% { clip: rect(67px, 9999px, 78px, 0); transform: translate(-2px, 2px); }
-  95% { clip: rect(44px, 9999px, 33px, 0); transform: translate(2px, -2px); }
-  100% { clip: rect(88px, 9999px, 99px, 0); transform: translate(-2px, 2px); }
-}
-
 @keyframes btn-glitch {
-  0% { transform: translate(0) }
-  20% { transform: translate(-2px, 2px) }
-  40% { transform: translate(-2px, -2px) }
-  60% { transform: translate(2px, 2px) }
-  80% { transform: translate(2px, -2px) }
-  100% { transform: translate(0) }
+  0% { transform: translate(0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(-3px, -2px); }
+  60% { transform: translate(3px, 2px); }
+  80% { transform: translate(3px, -2px); }
+  100% { transform: translate(0); }
 }
 
-@keyframes scanline {
-  0% { top: -10%; }
-  100% { top: 110%; }
+@keyframes winner-impact {
+  0% {
+    transform: scale(1.4);
+    opacity: 0;
+    filter: brightness(3);
+  }
+  60% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(0deg); }
+  21% { transform: skew(-3deg); }
+  22% { transform: skew(3deg); }
+  23% { transform: skew(0deg); }
+  85% { transform: skew(0deg); }
+  86% { transform: skew(2deg); }
+  87% { transform: skew(-2deg); }
+  88% { transform: skew(0deg); }
+  100% { transform: skew(0deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate3d(-6px, 2px, 0); }
+  20%, 40%, 60%, 80% { transform: translate3d(6px, -2px, 0); }
 }
 
 /* --------------------------------------------------------------------------
-   10. RESPONSIVE DESIGN (Media Queries)
+   9. RESPONSIVE DESIGN (SMARTPHONE & TABLET)
    -------------------------------------------------------------------------- */
-@media (max-width: 1200px) {
-  .grid-cols-4 { grid-template-columns: repeat(3, 1fr); }
-  h1, .h1 { font-size: 2.5rem; }
-}
-
-@media (max-width: 992px) {
-  .grid-cols-3, .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
-  h1, .h1 { font-size: 2rem; }
-  h2, .h2 { font-size: 1.75rem; }
-}
-
 @media (max-width: 768px) {
-  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
-  body { background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px; }
-  .hud-box { padding: var(--space-3); }
-  .btn-cyber { padding: 12px 24px; font-size: 1rem; }
+  #app-container {
+    padding: 1rem;
+  }
+
+  .glass-panel {
+    padding: 1.4rem;
+  }
+
+  header h1 {
+    font-size: 2.1rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+  }
+
+  .roulette-wrapper {
+    max-width: 320px;
+  }
+
+  .center-hub {
+    width: 88px;
+    height: 88px;
+    border-width: 3px;
+  }
+
+  .hub-btn {
+    width: 76px;
+    height: 76px;
+    font-size: 1.05rem;
+  }
+
+  .status-display,
+  #status-text {
+    font-size: 1.05rem;
+  }
+
+  .winner-text {
+    font-size: 2.2rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
-  h1, .h1 { font-size: 1.75rem; }
-  h2, .h2 { font-size: 1.5rem; }
-  .p-5 { padding: var(--space-3); }
-  .btn-cyber { width: 100%; }
+  header h1 {
+    font-size: 1.7rem;
+  }
+
+  .preset-chips {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preset-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .roulette-wrapper {
+    max-width: 270px;
+  }
+
+  .action-btn {
+    font-size: 1.05rem;
+    padding: 14px 16px;
+  }
 }
+
