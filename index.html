@@ -4,37 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ru-ret</title>
-    <!-- ここで先ほど更新した style.css を読み込みます -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-base crt-container flex flex-col items-center justify-center min-h-screen p-5">
 
     <div class="hud-box text-center w-full max-w-2xl mt-5">
-        
-        <!-- スピンボタン -->
         <button id="spin-btn" class="btn-cyber mb-4 w-full">SPIN!</button>
-        
-        <!-- ステータステキスト -->
         <p id="status-text" class="text-main h5 text-neon-cyan">WAITING FOR SPIN...</p>
         
-        <!-- 判定テキスト（グリッチエフェクト付き） -->
         <h2 class="h2 text-neon-pink mt-5 text-glitch" data-text="THE VERDICT IS...">THE VERDICT IS...</h2>
         
-        <!-- 結果表示エリア -->
         <div class="mt-4 p-4" style="background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan);">
             <p id="result-main" class="h1 text-neon-yellow m-0">???</p>
             <p id="result-sub" class="text-main text-neon-red mt-2 m-0">Defeated: ???</p>
         </div>
 
-        <!-- アクションボタン -->
         <div class="flex gap-4 justify-center mt-5 flex-wrap">
             <button id="save-btn" class="btn-cyber btn-cyber-pink flex-1">📸 SAVE RESULT</button>
             <button id="restart-btn" class="btn-cyber btn-cyber-red flex-1">↻ RESTART</button>
         </div>
-        
     </div>
 
-    <!-- JSファイルの読み込み（GitHubの構成に合わせています） -->
     <script src="audio.js"></script>
     <script src="particles.js"></script>
     <script src="roulette.js"></script>
