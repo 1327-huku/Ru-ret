@@ -1,4 +1,4 @@
-// 物理演算ルーレットエンジン
+// 物理演算ルーレットエンジン（サイバーパンク・ネオン同期版）
 const canvas = document.getElementById('roulette-canvas');
 const ctx = canvas.getContext('2d');
 const btnSpin = document.getElementById('btn-spin');
@@ -16,11 +16,18 @@ const PI2 = Math.PI * 2;
 const numSegments = 8; // AとBが交互に4つずつ
 const segmentAngle = PI2 / numSegments;
 
+// サイバーパンクカラーパレット（CSSと完全同期）
+const COLOR_A_BG = '#22000c';
+const COLOR_A_NEON = '#ff003c'; // Red / Crimson
+const COLOR_B_BG = '#001a24';
+const COLOR_B_NEON = '#00f3ff'; // Neon Cyan
+const COLOR_ACCENT = '#ff00ea'; // Neon Pink
+
 // 描画関数
 function drawRoulette() {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
-  const radius = cx - 20;
+  const radius = cx - 24;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -32,47 +39,76 @@ function drawRoulette() {
     const isRed = i % 2 === 0;
     const startAngle = i * segmentAngle;
     const endAngle = startAngle + segmentAngle;
+    const neonColor = isRed ? COLOR_A_NEON : COLOR_B_NEON;
 
+    // セグメント背景
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radius, startAngle, endAngle);
     ctx.closePath();
 
-    ctx.fillStyle = isRed ? '#2a000a' : '#001a22';
+    ctx.fillStyle = isRed ? COLOR_A_BG : COLOR_B_BG;
     ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = isRed ? '#ff003c' : '#00f0ff';
-    ctx.stroke();
 
-    // テキスト描画
+    // ネオン発光する境界線
+    ctx.save();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = neonColor;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = neonColor;
+    ctx.stroke();
+    ctx.restore();
+
+    // テキスト描画（多重ネオングロー）
     ctx.save();
     ctx.rotate(startAngle + segmentAngle / 2);
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 24px "Noto Sans JP", sans-serif';
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = isRed ? '#ff003c' : '#00f0ff';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px "Courier New", "Noto Sans JP", monospace';
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = neonColor;
     
     const text = isRed ? optA : optB;
-    ctx.fillText(text, radius - 30, 0);
+    ctx.fillText(text, radius - 34, 0);
+    // 2度描きで発光を強調
+    ctx.shadowBlur = 6;
+    ctx.fillText(text, radius - 34, 0);
     ctx.restore();
     
-    // ピン描画
+    // ピン描画（ネオンイエロー発光）
+    ctx.save();
+    const pinX = Math.cos(startAngle) * (radius - 12);
+    const pinY = Math.sin(startAngle) * (radius - 12);
     ctx.beginPath();
-    ctx.arc(Math.cos(startAngle) * (radius - 10), Math.sin(startAngle) * (radius - 10), 5, 0, PI2);
-    ctx.fillStyle = '#fff';
+    ctx.arc(pinX, pinY, 5, 0, PI2);
+    ctx.fillStyle = '#fcee0a';
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#fcee0a';
     ctx.fill();
+    ctx.restore();
   }
 
   ctx.restore();
   
-  // 外枠ネオン
+  // 外枠の二重ネオンリング
+  ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, radius, 0, PI2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  ctx.lineWidth = 10;
+  ctx.strokeStyle = COLOR_B_NEON;
+  ctx.lineWidth = 6;
+  ctx.shadowBlur = 25;
+  ctx.shadowColor = COLOR_B_NEON;
   ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + 8, 0, PI2);
+  ctx.strokeStyle = COLOR_ACCENT;
+  ctx.lineWidth = 2;
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = COLOR_ACCENT;
+  ctx.stroke();
+  ctx.restore();
 }
 
 let lastTickAngle = 0;
@@ -100,7 +136,8 @@ function update() {
     if (velocity < 0.05) {
       phase = 'slowing';
       statusText.textContent = "CRITICAL PHASE...";
-      statusText.style.color = "#ffcc00";
+      statusText.style.color = "#fcee0a";
+      statusText.style.textShadow = "0 0 10px #fcee0a, 0 0 20px #fcee0a";
     }
   } else if (phase === 'slowing') {
     velocity *= 0.985;
@@ -108,7 +145,8 @@ function update() {
       phase = 'heartbeats';
       velocity = 0.008; // 超低速固定
       statusText.textContent = "VERDICT INCOMING...";
-      statusText.style.color = "#fff";
+      statusText.style.color = "#ff00ea";
+      statusText.style.textShadow = "0 0 10px #ff00ea, 0 0 25px #ff00ea";
       AudioEngine.playHeartbeat();
       setTimeout(() => AudioEngine.playHeartbeat(), 800);
       setTimeout(() => AudioEngine.playHeartbeat(), 1600);
@@ -160,7 +198,8 @@ const Roulette = {
     btnSpin.classList.add('spinning');
     btnSpin.textContent = "WAIT...";
     statusText.textContent = "ROULETTE IS SPINNING!";
-    statusText.style.color = "#00f0ff";
+    statusText.style.color = "#00f3ff";
+    statusText.style.textShadow = "0 0 10px #00f3ff, 0 0 20px #00f3ff";
     update();
   }
 };
