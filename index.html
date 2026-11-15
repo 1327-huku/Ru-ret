@@ -1,75 +1,43 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>NEON DECISION - Party Roulette -</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ru-ret</title>
+    <!-- ここで先ほど更新した style.css を読み込みます -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="bg-base crt-container flex flex-col items-center justify-center min-h-screen p-5">
 
-  <!-- 背景・VFXキャンバス -->
-  <canvas id="fx-canvas"></canvas>
-
-  <div id="app-container">
-    <header class="glass-panel">
-      <h1>NEON DECISION</h1>
-      <p class="subtitle">Ultimate Party Roulette</p>
-    </header>
-
-    <main>
-      <!-- 入力フェーズ -->
-      <div id="input-phase" class="glass-panel active-phase">
-        <h2>What's your dilemma?</h2>
-        <div class="input-group">
-          <label for="opt-a" class="opt-label a-label">OPTION A (Red)</label>
-          <input type="text" id="opt-a" placeholder="例: ゲーセン行く" maxlength="20" autocomplete="off">
+    <div class="hud-box text-center w-full max-w-2xl mt-5">
+        
+        <!-- スピンボタン -->
+        <button id="spin-btn" class="btn-cyber mb-4 w-full">SPIN!</button>
+        
+        <!-- ステータステキスト -->
+        <p id="status-text" class="text-main h5 text-neon-cyan">WAITING FOR SPIN...</p>
+        
+        <!-- 判定テキスト（グリッチエフェクト付き） -->
+        <h2 class="h2 text-neon-pink mt-5 text-glitch" data-text="THE VERDICT IS...">THE VERDICT IS...</h2>
+        
+        <!-- 結果表示エリア -->
+        <div class="mt-4 p-4" style="background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan);">
+            <p id="result-main" class="h1 text-neon-yellow m-0">???</p>
+            <p id="result-sub" class="text-main text-neon-red mt-2 m-0">Defeated: ???</p>
         </div>
-        <div class="input-group">
-          <label for="opt-b" class="opt-label b-label">OPTION B (Blue)</label>
-          <input type="text" id="opt-b" placeholder="例: 家でゴロゴロ" maxlength="20" autocomplete="off">
+
+        <!-- アクションボタン -->
+        <div class="flex gap-4 justify-center mt-5 flex-wrap">
+            <button id="save-btn" class="btn-cyber btn-cyber-pink flex-1">📸 SAVE RESULT</button>
+            <button id="restart-btn" class="btn-cyber btn-cyber-red flex-1">↻ RESTART</button>
         </div>
         
-        <div class="preset-chips">
-          <button class="preset-btn" data-a="ラーメン" data-b="カレー">🍜 ラーメン / カレー 🍛</button>
-          <button class="preset-btn" data-a="買う！" data-b="やめとく">💰 買う / やめる 🛑</button>
-          <button class="preset-btn" data-a="オールする" data-b="帰る">🌙 オール / 帰宅 🏠</button>
-        </div>
+    </div>
 
-        <button id="btn-start" class="action-btn glow-btn" disabled>SET ROULETTE</button>
-      </div>
-
-      <!-- ルーレットフェーズ -->
-      <div id="roulette-phase" class="glass-panel hidden">
-        <div class="roulette-wrapper">
-          <canvas id="roulette-canvas" width="600" height="600"></canvas>
-          <div class="roulette-pointer"></div>
-          <div class="center-hub">
-            <button id="btn-spin" class="hub-btn">SPIN!</button>
-          </div>
-        </div>
-        <div id="status-text" class="status-display">WAITING FOR SPIN...</div>
-      </div>
-
-      <!-- 結果発表フェーズ -->
-      <div id="result-phase" class="glass-panel hidden">
-        <h2 class="result-title">THE VERDICT IS...</h2>
-        <div id="result-winner" class="winner-text">???</div>
-        <div id="result-loser" class="loser-text">Defeated: ???</div>
-        
-        <div class="action-buttons">
-          <button id="btn-save" class="action-btn">📸 SAVE RESULT</button>
-          <button id="btn-reset" class="action-btn secondary-btn">↻ RESTART</button>
-        </div>
-      </div>
-    </main>
-
-  </div>
-
-  <!-- スクリプト群 -->
-  <script src="audio.js"></script>
-  <script src="particles.js"></script>
-  <script src="roulette.js"></script>
-  <script src="main.js"></script>
+    <!-- JSファイルの読み込み（GitHubの構成に合わせています） -->
+    <script src="audio.js"></script>
+    <script src="particles.js"></script>
+    <script src="roulette.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
