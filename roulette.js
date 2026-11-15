@@ -1,10 +1,9 @@
-// 本格物理演算ルーレットエンジン（剛体衝突・バネ振動・ピン抵抗シミュレーション）
+// 本格物理演算ルーレットエンジン（剛体衝突・バネ振動・火花スパーク・BGM＆ドラムロール同期版）
 const canvas = document.getElementById('roulette-canvas');
 const ctx = canvas.getContext('2d');
 const btnSpin = document.getElementById('btn-spin');
 const statusText = document.getElementById('status-text');
 
-// 元のHTML上の静的ポインターを隠す（Canvas内で物理演算フラッパーを描画するため）
 const staticPointer = document.querySelector('.roulette-pointer');
 if (staticPointer) staticPointer.style.display = 'none';
 
@@ -14,14 +13,14 @@ let optB = "B";
 // --- 物理演算パラメータ ---
 let wheelAngle = 0;          // ホイールの現在角度 (rad)
 let wheelVelocity = 0;       // ホイールの角速度 (rad/frame)
-const baseFriction = 0.996;  // 空気・軸受けの微弱な摩擦
-const pinDrag = 0.0022;      // ピンが針を弾くときに奪われるエネルギー
+const baseFriction = 0.996;  // 軸受け摩擦
+const pinDrag = 0.0022;      // ピン衝突時のエネルギー損失
 
 // 上部フラッパー（針）のバネ物理パラメータ
 let flapperAngle = 0;        // 針の傾き角度 (rad)
 let flapperVelocity = 0;     // 針の角速度
-const springK = 0.28;        // バネの硬さ（フックの法則）
-const springDamping = 0.82;  // 振動の減衰率
+const springK = 0.28;        // バネ定数
+const springDamping = 0.82;  // 減衰係数
 
 let isSpinning = false;
 let phase = 'idle';          // idle, spinning, critical, finished
@@ -31,9 +30,8 @@ let lastPassedPin = -1;
 const PI2 = Math.PI * 2;
 const numSegments = 8;
 const segmentAngle = PI2 / numSegments;
-const POINTER_ANGLE = Math.PI * 1.5; // 上部（270度位置）
+const POINTER_ANGLE = Math.PI * 1.5;
 
-// サイバーパンクカラーパレット
 const COLOR_A_BG = '#22000c';
 const COLOR_A_NEON = '#ff003c';
 const COLOR_B_BG = '#001a24';
@@ -41,59 +39,64 @@ const COLOR_B_NEON = '#00f3ff';
 const COLOR_ACCENT = '#ff00ea';
 const COLOR_PIN = '#fcee0a';
 
-// 物理演算ステップ更新
 function stepPhysics() {
-  // 1. ホイールの角速度と摩擦の計算
   if (isSpinning) {
     wheelAngle += wheelVelocity;
     wheelAngle = (wheelAngle % PI2 + PI2) % PI2;
 
-    // 軸受け摩擦
     wheelVelocity *= baseFriction;
+    const speed = Math.abs(wheelVelocity);
 
-    // 現在のピン位置と上部針の衝突判定
-    // 各セグメントの境界（i * segmentAngle）にピンがある
+    // シンセエンジン音のピッチ・フィルターを速度に同期
+    if (typeof AudioEngine.updateEngine === 'function') {
+      AudioEngine.updateEngine(speed * 2.2);
+    }
+
     const relativeAngle = (POINTER_ANGLE - wheelAngle + PI2 * 10) % PI2;
     const currentPinIndex = Math.floor(relativeAngle / segmentAngle);
     const distFromPin = relativeAngle % segmentAngle;
 
-    // ピン通過時の物理衝突（針を弾き、ホイールが減速する）
+    // ピン通過時の物理衝突
     if (currentPinIndex !== lastPassedPin) {
       lastPassedPin = currentPinIndex;
 
-      // ホイールの速度に応じて針を物理的に蹴り上げる
-      const impact = Math.min(Math.abs(wheelVelocity) * 2.8, 0.85);
+      const impact = Math.min(speed * 2.8, 0.85);
       flapperVelocity += (wheelVelocity >= 0 ? impact : -impact);
 
-      // 運動エネルギー損失（ピンに当たって減速）
-      if (Math.abs(wheelVelocity) > 0.004) {
+      if (speed > 0.004) {
         wheelVelocity *= (1 - pinDrag * 12);
       }
 
-      // 効果音再生
-      AudioEngine.playTick(Math.min(Math.abs(wheelVelocity) * 2.5, 1.5));
+      // 針先から火花（スパーク）を散らす
+      if (typeof VFX.spawnSparks === 'function') {
+        const rect = canvas.getBoundingClientRect();
+        const sparkX = rect.left + rect.width / 2;
+        const sparkY = rect.top + 28;
+        VFX.spawnSparks(sparkX, sparkY, speed * 2.5);
+      }
+
+      // 効果音＋低速域スネアドラムロール再生
+      const isCritical = (phase === 'critical');
+      AudioEngine.playTick(Math.min(speed * 2.5, 1.5), isCritical);
     }
 
     // 停止寸前の「ピン乗り越え／押し戻し」物理シミュレーション
-    if (Math.abs(wheelVelocity) < 0.015 && phase !== 'finished') {
-      // ピンが針のすぐ手前にある場合、針のバネ反発力で押し戻される力（トルク）が発生
+    if (speed < 0.015 && phase !== 'finished') {
       if (distFromPin < 0.08 && distFromPin > 0.005) {
-        wheelVelocity -= 0.00035; // 針に弾かれて逆回転する力
+        wheelVelocity -= 0.00035;
       } else if (distFromPin > segmentAngle - 0.08) {
-        wheelVelocity += 0.00035; // ピンを乗り越えて前に落ちる力
+        wheelVelocity += 0.00035;
       }
     }
 
-    // フェーズ演出の切り替え
-    const speed = Math.abs(wheelVelocity);
-    if (phase === 'spinning' && speed < 0.06) {
+    // フェーズ演出切り替え
+    if (phase === 'spinning' && speed < 0.065) {
       phase = 'critical';
       statusText.textContent = "CRITICAL PHYSICS PHASE...";
       statusText.style.color = "#fcee0a";
       statusText.style.textShadow = "0 0 12px #fcee0a";
     }
 
-    // 心音演出（低速域）
     if (phase === 'critical' && speed < 0.025 && speed > 0.001) {
       heartbeatTimer++;
       if (heartbeatTimer % 45 === 0) {
@@ -104,21 +107,20 @@ function stepPhysics() {
       }
     }
 
-    // 完全停止判定（速度と針の揺れがほぼゼロになったら確定）
+    // 完全停止判定
     if (speed < 0.0004 && Math.abs(flapperVelocity) < 0.002 && Math.abs(flapperAngle) < 0.01) {
       wheelVelocity = 0;
       finishSpin();
     }
   }
 
-  // 2. フラッパー（針）のバネ振動物理（Hooke's Law: F = -k * x）
+  // フラッパー（針）のバネ振動物理
   const springForce = -springK * flapperAngle;
   flapperVelocity += springForce;
   flapperVelocity *= springDamping;
   flapperAngle += flapperVelocity;
 }
 
-// 描画関数
 function drawRoulette() {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
@@ -126,7 +128,6 @@ function drawRoulette() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // --- ホイール本体 ---
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(wheelAngle);
@@ -137,7 +138,6 @@ function drawRoulette() {
     const endAngle = startAngle + segmentAngle;
     const neonColor = isRed ? COLOR_A_NEON : COLOR_B_NEON;
 
-    // セグメント塗りつぶし
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radius, startAngle, endAngle);
@@ -145,7 +145,6 @@ function drawRoulette() {
     ctx.fillStyle = isRed ? COLOR_A_BG : COLOR_B_BG;
     ctx.fill();
 
-    // ネオン境界線
     ctx.save();
     ctx.lineWidth = 4;
     ctx.strokeStyle = neonColor;
@@ -154,7 +153,6 @@ function drawRoulette() {
     ctx.stroke();
     ctx.restore();
 
-    // テキスト
     ctx.save();
     ctx.rotate(startAngle + segmentAngle / 2);
     ctx.textAlign = 'right';
@@ -167,7 +165,6 @@ function drawRoulette() {
     ctx.fillText(text, radius - 38, 0);
     ctx.restore();
 
-    // 物理衝突ピン（外周に配置）
     ctx.save();
     const pinX = Math.cos(startAngle) * (radius - 10);
     const pinY = Math.sin(startAngle) * (radius - 10);
@@ -185,7 +182,7 @@ function drawRoulette() {
 
   ctx.restore();
 
-  // --- 外周ネオンリング ---
+  // 外周二重ネオンリング
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, radius, 0, PI2);
@@ -204,16 +201,15 @@ function drawRoulette() {
   ctx.stroke();
   ctx.restore();
 
-  // --- 物理演算フラッパー（上部でバネ振動する針） ---
+  // 物理演算フラッパー（上部でバネ振動する針）
   ctx.save();
-  ctx.translate(cx, cy - radius - 14); // 針の支点
-  ctx.rotate(flapperAngle);            // バネ物理による傾きを適用
+  ctx.translate(cx, cy - radius - 14);
+  ctx.rotate(flapperAngle);
 
-  // 針の本体（サイバーパンク・ブレード）
   ctx.beginPath();
   ctx.moveTo(-14, -8);
   ctx.lineTo(14, -8);
-  ctx.lineTo(0, 38); // ピンに当たる先端
+  ctx.lineTo(0, 38);
   ctx.closePath();
 
   ctx.fillStyle = COLOR_PIN;
@@ -225,7 +221,6 @@ function drawRoulette() {
   ctx.strokeStyle = '#ffffff';
   ctx.stroke();
 
-  // 支点ボルト
   ctx.beginPath();
   ctx.arc(0, -4, 7, 0, PI2);
   ctx.fillStyle = '#050505';
@@ -248,7 +243,6 @@ function finishSpin() {
   btnSpin.classList.remove('spinning');
   btnSpin.textContent = "SPIN!";
 
-  // 最終停止角度から勝者を判定
   const pointerRelAngle = (POINTER_ANGLE - wheelAngle + PI2 * 10) % PI2;
   const winningSegment = Math.floor(pointerRelAngle / segmentAngle);
   const isRedWin = winningSegment % 2 === 0;
@@ -276,6 +270,7 @@ const Roulette = {
     flapperAngle = 0;
     flapperVelocity = 0;
     lastPassedPin = -1;
+    if (typeof AudioEngine.stopEngine === 'function') AudioEngine.stopEngine();
     drawRoulette();
   },
   spin() {
@@ -284,13 +279,13 @@ const Roulette = {
     phase = 'spinning';
     heartbeatTimer = 0;
     lastPassedPin = -1;
-    // ランダムな初速トルクを与える
     wheelVelocity = 0.42 + Math.random() * 0.25;
     btnSpin.classList.add('spinning');
     btnSpin.textContent = "WAIT...";
     statusText.textContent = "ROULETTE IS SPINNING!";
     statusText.style.color = "#00f3ff";
     statusText.style.textShadow = "0 0 12px #00f3ff";
+    if (typeof AudioEngine.startEngine === 'function') AudioEngine.startEngine();
   }
 };
 
@@ -299,5 +294,4 @@ btnSpin.addEventListener('click', () => {
   Roulette.spin();
 });
 
-// 物理演算＆描画ループ開始
 loop();
