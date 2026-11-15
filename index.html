@@ -2,27 +2,154 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ru-ret</title>
+    <title>NEON DECISION - Party Roulette -</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="bg-base crt-container flex flex-col items-center justify-center min-h-screen p-5">
+<body class="cyber-theme crt-enabled">
 
-    <div class="hud-box text-center w-full max-w-2xl mt-5">
-        <button id="spin-btn" class="btn-cyber mb-4 w-full">SPIN!</button>
-        <p id="status-text" class="text-main h5 text-neon-cyan">WAITING FOR SPIN...</p>
-        
-        <h2 class="h2 text-neon-pink mt-5 text-glitch" data-text="THE VERDICT IS...">THE VERDICT IS...</h2>
-        
-        <div class="mt-4 p-4" style="background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan);">
-            <p id="result-main" class="h1 text-neon-yellow m-0">???</p>
-            <p id="result-sub" class="text-main text-neon-red mt-2 m-0">Defeated: ???</p>
-        </div>
+    <!-- 必須ID: バックグラウンドVFX用キャンバス -->
+    <canvas id="fx-canvas"></canvas>
+    
+    <!-- 画面全体の走査線・ノイズオーバーレイ -->
+    <div class="crt-overlay"></div>
+    <div class="vignette-overlay"></div>
 
-        <div class="flex gap-4 justify-center mt-5 flex-wrap">
-            <button id="save-btn" class="btn-cyber btn-cyber-pink flex-1">📸 SAVE RESULT</button>
-            <button id="restart-btn" class="btn-cyber btn-cyber-red flex-1">↻ RESTART</button>
-        </div>
+    <!-- 必須ID: アプリケーションコンテナ -->
+    <div id="app-container" class="app-layout">
+        
+        <header class="cyber-header glass-panel">
+            <div class="header-decor-left"></div>
+            <h1 class="glitch-text" data-text="NEON DECISION">NEON DECISION</h1>
+            <p class="subtitle cyber-tag">Ultimate Party Roulette v3.0</p>
+            <div class="header-decor-right"></div>
+        </header>
+
+        <main class="cyber-main">
+            <!-- ========================================== -->
+            <!-- 必須ID: 入力フェーズ -->
+            <!-- ========================================== -->
+            <div id="input-phase" class="glass-panel phase-container active-phase">
+                <div class="panel-corner corner-tl"></div>
+                <div class="panel-corner corner-tr"></div>
+                <div class="panel-corner corner-bl"></div>
+                <div class="panel-corner corner-br"></div>
+                
+                <h2 class="neon-heading pulse-slow">What's your dilemma?</h2>
+                
+                <div class="input-wrapper">
+                    <div class="input-group">
+                        <label for="opt-a" class="opt-label a-label cyber-label">
+                            <span class="label-icon">A</span> OPTION <span class="badge badge-red">[RED]</span>
+                        </label>
+                        <div class="input-box-cyber">
+                            <input type="text" id="opt-a" class="cyber-input input-red" placeholder="例: ゲーセン行く" maxlength="20" autocomplete="off">
+                            <div class="input-scanline"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="opt-b" class="opt-label b-label cyber-label">
+                            <span class="label-icon">B</span> OPTION <span class="badge badge-blue">[CYAN]</span>
+                        </label>
+                        <div class="input-box-cyber">
+                            <input type="text" id="opt-b" class="cyber-input input-blue" placeholder="例: 家でゴロゴロ" maxlength="20" autocomplete="off">
+                            <div class="input-scanline"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preset-section">
+                    <p class="preset-title">// QUICK OVERRIDES</p>
+                    <div class="preset-chips">
+                        <button class="preset-btn cyber-chip chip-yellow" data-a="ラーメン" data-b="カレー">🍜 ラーメン / カレー 🍛</button>
+                        <button class="preset-btn cyber-chip chip-pink" data-a="買う！" data-b="やめとく">💰 買う / やめる 🛑</button>
+                        <button class="preset-btn cyber-chip chip-purple" data-a="オールする" data-b="帰る">🌙 オール / 帰宅 🏠</button>
+                    </div>
+                </div>
+
+                <div class="action-area">
+                    <!-- 必須ID: スタートボタン -->
+                    <button id="btn-start" class="action-btn cyber-btn-primary glow-btn" disabled>
+                        <span class="btn-text">INITIALIZE ROULETTE</span>
+                        <span class="btn-glitch"></span>
+                        <div class="btn-border-tracer"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 必須ID: ルーレットフェーズ -->
+            <!-- ========================================== -->
+            <div id="roulette-phase" class="glass-panel phase-container hidden">
+                <div class="hud-frame">
+                    <div class="hud-corner-tl"></div>
+                    <div class="hud-corner-tr"></div>
+                    <div class="hud-corner-bl"></div>
+                    <div class="hud-corner-br"></div>
+                    
+                    <div class="roulette-wrapper cyber-hud">
+                        <!-- 必須ID: ルーレット描画キャンバス -->
+                        <canvas id="roulette-canvas" width="600" height="600"></canvas>
+                        
+                        <div class="roulette-pointer cyber-pointer">
+                            <div class="pointer-triangle"></div>
+                        </div>
+                        
+                        <div class="center-hub cyber-hub">
+                            <!-- 必須ID: スピンボタン -->
+                            <button id="btn-spin" class="hub-btn neon-spin-btn">
+                                <span class="spin-text">SPIN!</span>
+                                <div class="hub-rings"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="status-container">
+                    <!-- 必須ID: ステータステキスト -->
+                    <div id="status-text" class="status-display neon-status glitch-subtext">SYSTEM READY... WAITING FOR SPIN INPUT</div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 必須ID: 結果フェーズ -->
+            <!-- ========================================== -->
+            <div id="result-phase" class="glass-panel phase-container hidden result-layout">
+                <div class="scan-bar-horizontal"></div>
+                
+                <div class="verdict-header">
+                    <h2 class="result-title cyber-glitch-title" data-text="THE VERDICT IS...">THE VERDICT IS...</h2>
+                </div>
+                
+                <div class="winner-display-box">
+                    <div class="box-bracket-left"></div>
+                    <!-- 必須ID: 勝者表示 -->
+                    <div id="result-winner" class="winner-text mega-neon-text">???</div>
+                    <div class="box-bracket-right"></div>
+                </div>
+                
+                <div class="loser-display-box">
+                    <!-- 必須ID: 敗者表示 -->
+                    <div id="result-loser" class="loser-text sub-neon-text">Defeated: ???</div>
+                </div>
+                
+                <div class="action-buttons cyber-action-group">
+                    <!-- 必須ID: 保存・リセットボタン -->
+                    <button id="btn-save" class="action-btn cyber-btn-secondary">
+                        <span class="btn-icon">📸</span> SAVE EVIDENCE
+                    </button>
+                    <button id="btn-reset" class="action-btn cyber-btn-danger">
+                        <span class="btn-icon">↻</span> REBOOT SYSTEM
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="cyber-footer">
+            <p class="sys-info">SYS.VER 3.0.0 // STATUS: ONLINE // PROTOCOL: OMEGA</p>
+        </footer>
     </div>
 
     <script src="audio.js"></script>
